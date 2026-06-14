@@ -16,16 +16,42 @@ This project is a beginner cybersecurity capstone to reflect on what I have lear
 - Attack and Defense Thinking
 
 ## How It Works
+1. A CSV file stores simulated login events.
+2. Python reads the CSV file using UTF-8 encoding.
+3. Events are inserted into a SQL database.
+4. Failed logins are counted by IP address.
+5. Each IP is then assigned a risk level.
+6. The program recommends any necessary defensive actions.
 
 ## Risk Levels
+| Failed Attempts | Risk |
+|---:|---|
+| 0-2 | Normal |
+| 3-4 | Low |
+| 5-9 | Medium |
+| 10+ | High |
 
 ## Security Relevance
+Repeated failed logins can indicate:
+- Brute-force attacks
+- Password guessing
+- Credential stuffing
+- Unauthorized access attempts
 
 ## CIA Triad Impact
+This attack mainly affects confidentiality as reflected on the report because successful attacks on logins could allow unauthorized access to private accounts or sensitive data.
 
 ## Defensive Controls
+Recommended defenses include:
+- Multi-factor authentication (MFA)
+- Account lockout policies
+- Rate limiting
+- Strong password rules
+- Login monitoring
+- Security Alerts
 
 ## What I Learned
+This project helped me immensely by connecting cybersecurity fundamentals to a practical detection workflow built in Python. I learned how networks, operating systems, software, databases, and defensive security all connect in a basic security monitoring scenario.
 
 ## References
 - TryHackMe. "Introduction to Cyber Security." TryHackMe, [https://tryhackme.com/](https://tryhackme.com/module/introduction-to-cyber-security)
