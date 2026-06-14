@@ -1,8 +1,19 @@
 # Pre-Security Capstone Lab: Login Attack Detection
 
 ## Project Overview
+This project is a beginner cybersecurity capstone to reflect on what I have learned on TryHackMe's Pre-Security learning path. It uses Python and SQL to analyze a sample of simulated login events and detect repeated failed login attempts.
 
 ## Skills Showcased
+- Cybersecurity Fundamentals
+- Networking Basics
+- IP Address Analysis
+- Client-server Concepts
+- Operating System Concepts
+- Python Scripting
+- SQL Databases
+- Log Analysis
+- CIA Triad Mapping
+- Attack and Defense Thinking
 
 ## How It Works
 
