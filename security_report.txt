@@ -2,19 +2,19 @@ Security Login Analysis Report
 ----------------------------------------
 
 IP Address: 10.0.0.25
-Failed Attempts: 5
+Max Failed Attempts in 5 Minutes: 5
 Risk Level: MEDIUM
 CIA Impact: Confidentiality
 Recommended Defense: Monitor IP, rate-limit login attempts, and require stronger authentication.
 
 IP Address: 172.16.0.9
-Failed Attempts: 3
+Max Failed Attempts in 5 Minutes: 3
 Risk Level: LOW
 CIA Impact: Confidentiality
 Recommended Defense: Watch for repeated failures and review account lockout settings.
 
 IP Address: 203.0.113.50
-Failed Attempts: 10
+Max Failed Attempts in 5 Minutes: 10
 Risk Level: HIGH
 CIA Impact: Confidentiality
 Recommended Defense: Block IP, enforce MFA, review logs, and alert security team.

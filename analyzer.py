@@ -2,18 +2,18 @@
 import csv
 import sqlite3
 from collections import Counter
+from datetime import datetime, timedelta
 
 # File names
 DATABASE_FILE = "security_logs.db"
 CSV_FILE = "login_events.csv"
 OUTPUT_FILE = "security_report.txt"
 
-# Thresholds for determining if an IP is suspicious
-# These thresholds are for a beginner lab using simulated data. 
-# In a real environment, failed login risk should be measured within a time window, such as 5 minutes, 15 minutes, or 1 hour.
+# Thresholds for determining if an IP is suspicious within 5 minutes
 HIGH_THRESHOLD_RISK = 10
 MEDIUM_THRESHOLD_RISK = 5
 LOW_THRESHOLD_RISK = 3
+TIME_WINDOW_MINUTES = 5
 
 # Create the login_events database
 def create_database(connection: sqlite3.Connection) -> None:
@@ -85,32 +85,67 @@ def get_recommendation(risk):
         return "No immediate action needed."
     
 
+# Calculate max attempts in a specific window
+# Thanks to ChatGPT for helping me create this function
+def get_max_attempts_in_window(timestamps):
+    time_window = timedelta(minutes=TIME_WINDOW_MINUTES)
+    max_attempts = 0
+
+    for start_index in range(len(timestamps)):
+        window_start = timestamps[start_index]
+        window_end = window_start + time_window
+        count = 0
+
+        for timestamp in timestamps:
+            if window_start <= timestamp <= window_end:
+                count += 1
+
+        max_attempts = max(max_attempts, count)
+
+    return max_attempts
+    
+
 # Analysis of failed login patterns from the data and create a report
 def analyze_failed_logins(connection: sqlite3.Connection) -> None:
     rows = connection.execute(
         """
-        SELECT ip_address FROM login_events
+        SELECT timestamp, ip_address FROM login_events
         WHERE status = 'failed'
+        ORDER BY ip_address, timestamp
         """
     ).fetchall()
 
-    failed_attempts = Counter(row[0] for row in rows)
+    failed_logins_ip = {}
+    suspicious_find = False
+
+    for timestamp_text, ip_address in rows:
+            timestamp = datetime.strptime(timestamp_text, "%Y-%m-%d %H:%M:%S")
+
+            if ip_address not in failed_logins_ip:
+                failed_logins_ip[ip_address] = []
+
+            failed_logins_ip[ip_address].append(timestamp)
 
     with open(OUTPUT_FILE, "w", encoding="utf-8", newline="") as file:
         file.write("Security Login Analysis Report\n")
         file.write("-" * 40 + "\n")
-        if not failed_attempts:
-            file.write("No failed login attempts found.\n")
 
-        for ip_address, count in failed_attempts.items():
-            risk = classify_risk(count)
+        for ip_address, timestamps in failed_logins_ip.items():
+            max_attempts_in_window = get_max_attempts_in_window(timestamps)
+            risk = classify_risk(max_attempts_in_window)
+            if risk == "NORMAL":
+                continue
+            suspicious_find = True
             recommendation = get_recommendation(risk)
 
             file.write(f"\nIP Address: {ip_address}\n")
-            file.write(f"Failed Attempts: {count}\n")
+            file.write(f"Max Failed Attempts in {TIME_WINDOW_MINUTES} Minutes: {max_attempts_in_window}\n")
             file.write(f"Risk Level: {risk}\n")
             file.write("CIA Impact: Confidentiality\n")
             file.write(f"Recommended Defense: {recommendation}\n")
+
+        if not suspicious_find:
+            file.write("No failed login attempts found.\n")
 
 
 def main():
